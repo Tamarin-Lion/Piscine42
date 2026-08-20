@@ -6,7 +6,7 @@
 /*   By: nbenhass <nbenhass@learner.42.tech>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/20 11:41:43 by nbenhass          #+#    #+#             */
-/*   Updated: 2026/08/20 17:56:23 by nbenhass         ###   ########.fr       */
+/*   Updated: 2026/08/20 19:57:21 by nbenhass         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,28 +61,36 @@ int	count_words(char *str, char *charset)
 	return (c);
 }
 
-int	is_sep(char str, char *charset)
+int	is_sep(char s, char *charset)
 {
 	int	c;
 
 	c = 0;
 	while (charset[c])
 	{
-		if (str == charset[c])
+		if (s == charset[c])
 			return (1);
 		c++;
 	}
 	return (0);
 }
 
-int	ft_strlen(char *l)
+char	*putstr(char *str, char *charset, int i)
 {
-	int	i;
+	char	*cpy;
+	int	s;
 
-	i = 0;
-	while (l[i])
+	s = 0;
+	cpy = malloc(sizeof(char) * word_length(str, charset, i) + 1);
+	while (str[i] && !(is_sep(str[i], charset)))
+	{
+		cpy[s] = str[i];
+		s++;
 		i++;
-	return (i);
+	}
+	cpy[s] = '\0';
+	printf("copy is : %s\n", cpy);
+	return (cpy);
 }
 
 char	**ft_split(char *str, char *charset)
@@ -90,55 +98,37 @@ char	**ft_split(char *str, char *charset)
 	char	**split;
 	int	i;
 	int	w;
-	int	c;
-	int	alloc;
 
 	i = 0;
 	w = 0;
-	alloc = ft_strlen(str) - count_words(str, charset) + 1;
 	if (!str || !charset)
 		return (NULL);
-	split = malloc(sizeof(**split) * alloc);
-//	split = malloc(500); //a supp
+	split = malloc(sizeof(char *) * count_words(str, charset) + 1);
+	while (is_sep(str[i], charset))
+		i++;
 	while (str[i])
 	{
-		if (is_sep(str[i], charset))
-		{
+		split[w] = putstr(str, charset, i);
+		i += word_length(str, charset, i);
+		while (is_sep(str[i], charset))
 			i++;
-		}
-		else
-		{
-			c = 0;
-			while (!(is_sep(str[i], charset)))
-			{
-				split[w][c] = str[i];
-				i++;
-			}
-			w++;
-		}
+		w++;
 	}
-	*split[w] = '\0';
+	split[w] = 0;
 	return (split);
 }
 
 int	main()
 {
-	char	str[] = "PuissantgoCommegoEspritgoDegoConquete";
-	char	charset[] = "go";
+	char	str[] = "PuissantgdCommegdEspritgdDegdConquete";
+	char	charset[] = "gd";
 	char	**test;
-	int i = 0;
 	int w = 0;
 	
 	test = ft_split(str, charset);
-	while (**test)
+	while (test[w])
 	{
-		i = 0;
-		while(test[w][i])
-		{
-			printf("%c", test[w][i]);
-			i++;
-		}
-		printf("\n");
+		printf("%s ", test[w]);
 		w++;
 	}
 }
